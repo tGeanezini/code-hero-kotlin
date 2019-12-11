@@ -7,7 +7,7 @@ import retrofit2.http.Query
 interface ICharacterService {
     @GET("v1/public/characters")
     fun getCharacters(
-        @Query("ts") ts: Long,
+        @Query("ts") ts: String,
         @Query("apikey") apikey: String,
-        @Query("hash") hash: String) : Call<List<Character>>
+        @Query("hash") hash: String) : Call<CharacterResponse>
 }

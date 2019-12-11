@@ -28,8 +28,8 @@ class CharactersAdapter (private val characters: List<Character>) :
 
     override fun onBindViewHolder(holder: CharactersViewHolder, position: Int) {
         val character = characters[position]
-        holder.image.setImageURI(Uri.parse(character.thumbnail.path))
+        holder.image.setImageURI(Uri.parse(
+            "${character.thumbnail.path}/${THUMBNAIL_MEDIUM}.${character.thumbnail.extension}"))
         holder.name.text = character.name
     }
-
 }
