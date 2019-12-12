@@ -7,9 +7,9 @@ data class Character (
     var modified: String,
     var thumbnail: CharacterThumbnail,
     var resourceUri: String,
-    var comics: List<CharacterComics>,
-    var series: List<CharacterSeries>,
-    var stories: List<CharacterStories>,
-    var events: List<CharacterEvents>,
+    var comics: CharacterComics,
+    var series: CharacterSeries,
+    var stories: CharacterStories,
+    var events: CharacterEvents,
     var urls: List<Url>
 )

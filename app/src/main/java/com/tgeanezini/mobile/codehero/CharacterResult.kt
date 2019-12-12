@@ -5,5 +5,5 @@ data class CharacterResult (
     var limit: Int,
     var total: Int,
     var count: Int,
-    var result: List<Character>
+    var results: List<Character>
 )

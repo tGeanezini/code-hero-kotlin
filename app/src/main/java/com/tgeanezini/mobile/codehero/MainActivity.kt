@@ -3,10 +3,9 @@ package com.tgeanezini.mobile.codehero
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -14,8 +13,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.math.BigInteger
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -33,15 +32,37 @@ class MainActivity : AppCompatActivity() {
         remoteConfig.setConfigSettingsAsync(remoteConfigSettings)
 
         fetchConfigs()
+    }
 
-        // Mover para o fetchConfigs()
+    private fun checkInternetConnection(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return activeNetwork?.isConnected == true
+    }
+
+    private fun fetchConfigs() {
+        remoteConfig.fetchAndActivate().addOnCompleteListener(this) {
+            getRequestParameters()
+        }
+    }
+
+    private fun getRequestParameters() {
         val ts = System.currentTimeMillis().toString()
-        val privateApiKey = remoteConfig.getString(PRIVATE_API_KEY)
-        val publicApiKey = remoteConfig.getString(PUBLIC_API_KEY)
-        val hash = createRequestHash(ts, privateApiKey, publicApiKey)
+        val privateApiKey = remoteConfig.getString("PRIVATE_KEY")
+        val publicApiKey = remoteConfig.getString("PUBLIC_KEY")
 
+        val input = ts + privateApiKey + publicApiKey
+        val hash = input.md5()
 
-        // Mover para outro local
+        loadCharacters(ts, publicApiKey, hash)
+    }
+
+    fun String.md5(): String {
+        val md = MessageDigest.getInstance("MD5")
+        return BigInteger(1, md.digest(toByteArray())).toString(16).padStart(32, '0')
+    }
+
+    private fun loadCharacters(ts: String, publicApiKey: String, hash: String) {
         val charactersCall = RetrofitInitializer(this)
             .characterService().getCharacters(
                 ts,
@@ -51,11 +72,11 @@ class MainActivity : AppCompatActivity() {
         charactersCall.enqueue(object: Callback<CharacterResponse> {
             override fun onResponse(call: Call<CharacterResponse>, response: Response<CharacterResponse>) {
                 response.body()?.let {
-                    val characters = it.data.result
+                    val characters = it.data.results
 
                     recyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
                         setHasFixedSize(true)
-                        adapter = CharactersAdapter(characters)
+                        adapter = CharactersAdapter(characters, applicationContext)
                         layoutManager = LinearLayoutManager(applicationContext)
                     }
                 }
@@ -73,45 +94,5 @@ class MainActivity : AppCompatActivity() {
                 dialog.show()
             }
         })
-    }
-
-    private fun checkInternetConnection(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-        return activeNetwork?.isConnected == true
-    }
-
-    private fun fetchConfigs() {
-        remoteConfig.fetch().addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                remoteConfig.activate()
-
-                // Chamar funções de acesso ao server aqui dentro
-            }
-            else {
-                Toast.makeText(this, "Falha ao obter configurações do app", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun createRequestHash(ts: String, publicKey: String, privateKey: String) : String {
-        val input = ts + privateKey + publicKey
-
-        try {
-            val md = MessageDigest.getInstance("MD5")
-            md.update(input.toByteArray())
-            val bytes = md.digest()
-
-            val md5 = StringBuffer()
-            for (i in 0 .. bytes.size) {
-                md5.append(Integer.toHexString(0xFF and bytes[i].toInt()))
-            }
-
-            return md5.toString()
-        } catch (ex: NoSuchAlgorithmException) {
-            ex.printStackTrace()
-        }
-
-        return ""
     }
 }
