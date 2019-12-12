@@ -22,10 +22,12 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var charactersRecyclerView: RecyclerView
     private lateinit var remoteConfig: FirebaseRemoteConfig
     lateinit var characters: List<Character>
     lateinit var adapter: CharactersAdapter
+    lateinit var pages: List<List<Character>>
+    private lateinit var footerRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,11 +76,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 adapter = CharactersAdapter(filteredList, applicationContext)
-                recyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
+                charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
                     setHasFixedSize(true)
                     layoutManager = LinearLayoutManager(applicationContext)
                 }
-                recyclerView.adapter = adapter
+                charactersRecyclerView.adapter = adapter
                 adapter.notifyDataSetChanged()
             }
         })
@@ -127,10 +129,17 @@ class MainActivity : AppCompatActivity() {
 
                     characters = it.data.results
 
-                    recyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
+                    pages = characters.chunked(3)
+
+                    charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
                         setHasFixedSize(true)
-                        adapter = CharactersAdapter(characters, applicationContext)
+                        adapter = CharactersAdapter(pages[0], applicationContext)
                         layoutManager = LinearLayoutManager(applicationContext)
+                    }
+
+                    footerRecyclerView = findViewById<RecyclerView>(R.id.footerPages).apply {
+                        setHasFixedSize(true)
+                        adapter = ListFooterAdapter(pages.size)
                     }
                 }
             }
