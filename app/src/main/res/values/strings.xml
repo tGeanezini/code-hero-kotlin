@@ -5,4 +5,5 @@
     <string name="busca_personagem_label">Nome do Personagem</string>
     <string name="dialog_falha_title">Falha</string>
     <string name="dialog_falha_message">Falha ao buscar personagens</string>
+    <string name="progress_characters">Carregando personagens</string>
 </resources>

@@ -4,12 +4,14 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
+import android.view.View
+import android.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -72,6 +74,9 @@ class MainActivity : AppCompatActivity() {
         charactersCall.enqueue(object: Callback<CharacterResponse> {
             override fun onResponse(call: Call<CharacterResponse>, response: Response<CharacterResponse>) {
                 response.body()?.let {
+                    charactersLoading.visibility = View.GONE
+                    content.visibility = View.VISIBLE
+
                     val characters = it.data.results
 
                     recyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
