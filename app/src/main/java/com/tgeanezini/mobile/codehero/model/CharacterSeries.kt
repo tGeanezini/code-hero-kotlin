@@ -1,4 +1,6 @@
-package com.tgeanezini.mobile.codehero
+package com.tgeanezini.mobile.codehero.model
+
+import com.tgeanezini.mobile.codehero.model.CharacterItems
 
 data class CharacterSeries (
     var available: Int,

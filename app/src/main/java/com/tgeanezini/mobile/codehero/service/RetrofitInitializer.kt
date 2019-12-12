@@ -1,6 +1,7 @@
-package com.tgeanezini.mobile.codehero
+package com.tgeanezini.mobile.codehero.service
 
 import android.content.Context
+import com.tgeanezini.mobile.codehero.util.BASE_URL
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

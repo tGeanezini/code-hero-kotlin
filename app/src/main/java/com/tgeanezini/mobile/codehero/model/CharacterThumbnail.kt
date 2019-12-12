@@ -1,4 +1,4 @@
-package com.tgeanezini.mobile.codehero
+package com.tgeanezini.mobile.codehero.model
 
 data class CharacterThumbnail (
     var path: String,

@@ -1,4 +1,4 @@
-package com.tgeanezini.mobile.codehero
+package com.tgeanezini.mobile.codehero.ui
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -8,13 +8,21 @@ import android.view.View
 import android.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.tgeanezini.mobile.codehero.R
+import com.tgeanezini.mobile.codehero.adapter.CharactersAdapter
+import com.tgeanezini.mobile.codehero.adapter.ListFooterAdapter
+import com.tgeanezini.mobile.codehero.model.Character
+import com.tgeanezini.mobile.codehero.model.CharacterResponse
+import com.tgeanezini.mobile.codehero.service.RetrofitInitializer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_characters.*
+import kotlinx.android.synthetic.main.list_character_footer.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,12 +30,13 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var charactersRecyclerView: RecyclerView
     private lateinit var remoteConfig: FirebaseRemoteConfig
-    lateinit var characters: List<Character>
-    lateinit var adapter: CharactersAdapter
-    lateinit var pages: List<List<Character>>
+    private lateinit var characters: List<Character>
+    private lateinit var adapter: CharactersAdapter
+    private lateinit var pages: List<List<Character>>
+    private lateinit var charactersRecyclerView: RecyclerView
     private lateinit var footerRecyclerView: RecyclerView
+    private var currentPage = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +74,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.toString() == "") {
+                    currentPage = 0
+                    loadCharactersList(currentPage)
+                    listFooter.visibility = View.VISIBLE
+                    return
+                }
+
+                listFooter.visibility = View.GONE
+
                 val query = s.toString().toLowerCase().trim()
                 val filteredList = ArrayList<Character>()
 
@@ -84,6 +102,20 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
         })
+
+        nextPage.setOnClickListener {
+            if (currentPage < pages.size - 1) {
+                currentPage++
+                loadCharactersList(currentPage)
+            }
+        }
+
+        previousPage.setOnClickListener {
+            if (currentPage > 0) {
+                currentPage--
+                loadCharactersList(currentPage)
+            }
+        }
     }
 
     private fun checkInternetConnection(context: Context): Boolean {
@@ -115,11 +147,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadCharacters(ts: String, publicApiKey: String, hash: String) {
-        val charactersCall = RetrofitInitializer(this)
-            .characterService().getCharacters(
-                ts,
-                publicApiKey,
-                hash)
+        val charactersCall = RetrofitInitializer(
+            this
+        )
+            .characterService().getCharacters(ts, publicApiKey, hash)
 
         charactersCall.enqueue(object: Callback<CharacterResponse> {
             override fun onResponse(call: Call<CharacterResponse>, response: Response<CharacterResponse>) {
@@ -129,13 +160,14 @@ class MainActivity : AppCompatActivity() {
 
                     characters = it.data.results
 
-                    pages = characters.chunked(3)
+                    pages = characters.chunked(4)
 
-                    charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
-                        setHasFixedSize(true)
-                        adapter = CharactersAdapter(pages[0], applicationContext)
-                        layoutManager = LinearLayoutManager(applicationContext)
-                    }
+//                    charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
+//                        setHasFixedSize(true)
+//                        adapter = CharactersAdapter(pages[currentPage], applicationContext)
+//                        layoutManager = LinearLayoutManager(applicationContext)
+//                    }
+                    loadCharactersList(currentPage)
 
                     footerRecyclerView = findViewById<RecyclerView>(R.id.footerPages).apply {
                         setHasFixedSize(true)
@@ -156,5 +188,13 @@ class MainActivity : AppCompatActivity() {
                 dialog.show()
             }
         })
+    }
+
+    private fun loadCharactersList(page: Int) {
+        charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
+            setHasFixedSize(true)
+            adapter = CharactersAdapter(pages[page], applicationContext)
+            layoutManager = LinearLayoutManager(applicationContext)
+        }
     }
 }

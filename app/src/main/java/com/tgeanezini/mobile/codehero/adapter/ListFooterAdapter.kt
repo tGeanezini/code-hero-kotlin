@@ -1,9 +1,10 @@
-package com.tgeanezini.mobile.codehero
+package com.tgeanezini.mobile.codehero.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.tgeanezini.mobile.codehero.R
 import kotlinx.android.synthetic.main.page_item_footer.view.*
 
 class ListFooterAdapter(private val page: Int) :
@@ -17,7 +18,9 @@ class ListFooterAdapter(private val page: Int) :
         val footer = LayoutInflater.from(parent.context)
             .inflate(R.layout.page_item_footer, parent, false)
 
-        return FooterViewHolder(footer)
+        return FooterViewHolder(
+            footer
+        )
     }
 
     override fun getItemCount(): Int {

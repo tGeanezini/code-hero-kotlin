@@ -1,4 +1,4 @@
-package com.tgeanezini.mobile.codehero
+package com.tgeanezini.mobile.codehero.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.tgeanezini.mobile.codehero.R
+import com.tgeanezini.mobile.codehero.model.Character
 import kotlinx.android.synthetic.main.list_item_character.view.*
 
 class CharactersAdapter (private val characters: List<Character>, var context: Context) :
@@ -21,7 +23,9 @@ class CharactersAdapter (private val characters: List<Character>, var context: C
         val characterView = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_item_character, parent, false)
 
-        return CharactersViewHolder(characterView)
+        return CharactersViewHolder(
+            characterView
+        )
     }
 
     override fun getItemCount(): Int {

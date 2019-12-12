@@ -1,6 +1,6 @@
-package com.tgeanezini.mobile.codehero
+package com.tgeanezini.mobile.codehero.model
 
-data class CharacterEvents (
+data class CharacterComics (
     var available: Int,
     var collectionURI: String,
     var items: List<CharacterItems>,
