@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1081497373114",
+    "firebase_url": "https://marvel-code-hero.firebaseio.com",
+    "project_id": "marvel-code-hero",
+    "storage_bucket": "marvel-code-hero.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081497373114:android:3c1c189125775f2fc77583",
+        "android_client_info": {
+          "package_name": "com.tgeanezini.mobile.codehero"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081497373114-17g8f0hfsn4uus0ev12qh5qnbcfrtt51.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvFnZh9CtKfDnCmrmT38KJRjmLcf5yQvs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1081497373114-17g8f0hfsn4uus0ev12qh5qnbcfrtt51.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
