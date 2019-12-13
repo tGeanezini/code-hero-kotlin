@@ -10,6 +10,9 @@ import kotlinx.android.synthetic.main.page_item_footer.view.*
 class ListFooterAdapter(private val page: Int) :
     RecyclerView.Adapter<ListFooterAdapter.FooterViewHolder>() {
 
+    var selectedPosition = RecyclerView.NO_POSITION
+    var previousPosition = RecyclerView.NO_POSITION
+
     class FooterViewHolder(page: View) : RecyclerView.ViewHolder(page) {
         val page = page.pageLabel
     }
@@ -28,6 +31,9 @@ class ListFooterAdapter(private val page: Int) :
     }
 
     override fun onBindViewHolder(holder: FooterViewHolder, position: Int) {
+        holder.page.isSelected = (selectedPosition == position)
         holder.page.text = (position + 1).toString()
     }
+
+
 }

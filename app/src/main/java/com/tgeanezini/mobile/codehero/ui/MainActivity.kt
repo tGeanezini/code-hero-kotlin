@@ -8,7 +8,6 @@ import android.view.View
 import android.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +31,8 @@ import java.security.MessageDigest
 class MainActivity : AppCompatActivity() {
     private lateinit var remoteConfig: FirebaseRemoteConfig
     private lateinit var characters: List<Character>
-    private lateinit var adapter: CharactersAdapter
+    private lateinit var charactersAdapter: CharactersAdapter
+    private lateinit var pagesAdapter: ListFooterAdapter
     private lateinit var pages: List<List<Character>>
     private lateinit var charactersRecyclerView: RecyclerView
     private lateinit var footerRecyclerView: RecyclerView
@@ -93,13 +93,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                adapter = CharactersAdapter(filteredList, applicationContext)
+                charactersAdapter = CharactersAdapter(filteredList, applicationContext)
                 charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
                     setHasFixedSize(true)
                     layoutManager = LinearLayoutManager(applicationContext)
                 }
-                charactersRecyclerView.adapter = adapter
-                adapter.notifyDataSetChanged()
+                charactersRecyclerView.adapter = charactersAdapter
+                charactersAdapter.notifyDataSetChanged()
             }
         })
 
@@ -107,6 +107,7 @@ class MainActivity : AppCompatActivity() {
             if (currentPage < pages.size - 1) {
                 currentPage++
                 loadCharactersList(currentPage)
+                loadPagesList()
             }
         }
 
@@ -114,6 +115,7 @@ class MainActivity : AppCompatActivity() {
             if (currentPage > 0) {
                 currentPage--
                 loadCharactersList(currentPage)
+                loadPagesList()
             }
         }
     }
@@ -161,18 +163,12 @@ class MainActivity : AppCompatActivity() {
                     characters = it.data.results
 
                     pages = characters.chunked(4)
+                    pagesAdapter = ListFooterAdapter(pages.size)
 
-//                    charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
-//                        setHasFixedSize(true)
-//                        adapter = CharactersAdapter(pages[currentPage], applicationContext)
-//                        layoutManager = LinearLayoutManager(applicationContext)
-//                    }
                     loadCharactersList(currentPage)
 
-                    footerRecyclerView = findViewById<RecyclerView>(R.id.footerPages).apply {
-                        setHasFixedSize(true)
-                        adapter = ListFooterAdapter(pages.size)
-                    }
+                    loadPagesList()
+
                 }
             }
 
@@ -191,10 +187,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadCharactersList(page: Int) {
+        pagesAdapter.selectedPosition = page
+        pagesAdapter.notifyItemChanged(page)
+
         charactersRecyclerView = findViewById<RecyclerView>(R.id.charactersList).apply {
             setHasFixedSize(true)
             adapter = CharactersAdapter(pages[page], applicationContext)
             layoutManager = LinearLayoutManager(applicationContext)
+        }
+    }
+
+    private fun loadPagesList() {
+        val footerLayoutManager = LinearLayoutManager(applicationContext)
+        footerLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        footerLayoutManager.scrollToPosition(currentPage)
+        footerRecyclerView = findViewById<RecyclerView>(R.id.footerPages).apply {
+            setHasFixedSize(true)
+            adapter = pagesAdapter
+            layoutManager = footerLayoutManager
         }
     }
 }
